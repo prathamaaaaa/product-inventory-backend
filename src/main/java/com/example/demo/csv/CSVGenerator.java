@@ -12,7 +12,6 @@ public class CSVGenerator {
             writer.println("Product Name,Details,Price,Image URLs,Category ID,Subcategory ID,Category Name,Subcategory Name");
 
             for (Product product : products) {
-                // ✅ Handle null values safely
                 String name = escapeCSV(product.getName());
                 String details = escapeCSV(product.getDetails());
                 String price = product.getPrice() != null ? product.getPrice().toString() : "0";

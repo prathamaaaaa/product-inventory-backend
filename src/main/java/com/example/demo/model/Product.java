@@ -43,7 +43,16 @@ public class Product {
     
     private String details;
 
-    
+    private String storeid;
+    public String getStoreid() {
+		return storeid;
+	}
+
+	public void setStoreid(String storeid) {
+		this.storeid = storeid;
+	}
+
+
     @Column(name = "image_urls", length = 1000) // Store as a comma-separated string
     private String imageUrls = ""; // Default value to prevent null
 

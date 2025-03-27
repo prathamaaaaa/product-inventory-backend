@@ -31,7 +31,27 @@ public class Categories {
     @JsonManagedReference
     private List<Product> product; // One product can have multiple categories
 
-    public int getId() {
+    
+    private String adminid;
+    
+    private String storeid;
+    public String getStoreid() {
+		return storeid;
+	}
+
+	public void setStoreid(String storeid) {
+		this.storeid = storeid;
+	}
+
+	public String getAdminid() {
+		return adminid;
+	}
+
+	public void setAdminid(String adminid) {
+		this.adminid = adminid;
+	}
+
+	public int getId() {
         return id;
     }
 

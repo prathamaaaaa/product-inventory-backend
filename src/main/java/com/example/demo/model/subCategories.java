@@ -33,7 +33,28 @@ public class subCategories{
     @JsonManagedReference
     private List<Product> Product;
 
-    public List<Product> getProduct() {
+    
+    private String adminid;
+    
+    private String storeid;
+    public String getStoreid() {
+		return storeid;
+	}
+
+	public void setStoreid(String storeid) {
+		this.storeid = storeid;
+	}
+
+
+    public String getAdminid() {
+		return adminid;
+	}
+
+	public void setAdminid(String adminid) {
+		this.adminid = adminid;
+	}
+
+	public List<Product> getProduct() {
         return Product;
     }
 

@@ -13,10 +13,10 @@ public class ProductDTO {
     private String details;
     private boolean active;
     private String adminid;
-
+    private String storeid;
     // ✅ Fix constructor order to match how it's called in the controller
     public ProductDTO(int id, String name, BigDecimal price, String categoryName, 
-                      String subCategoryName, List<String> imageUrls, String details,boolean active, String adminid ) {
+                      String subCategoryName, List<String> imageUrls, String details,boolean active, String adminid , String storeid ) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -26,6 +26,7 @@ public class ProductDTO {
         this.details = details;
         this.active = active;
         this.adminid = adminid;
+        this.storeid=storeid;
     }
 
     // ✅ Standard Getters
@@ -38,4 +39,5 @@ public class ProductDTO {
     public String getDetails() { return details; }
     public boolean isActive() { return active; }
     public String getAdminid() {return adminid ;}
+    public String getStoreid() {return storeid;}
 }

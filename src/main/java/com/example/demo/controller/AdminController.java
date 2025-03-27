@@ -47,20 +47,18 @@ public class AdminController {
 	       try {
 	           System.out.println("🔹 Request received to delete admin and associated products: " + adminId);
 
-	           // ✅ Step 1: Delete all products of this admin
 	           List<Product> products = productRepository.findByAdminid(String.valueOf(adminId));
 	           if (!products.isEmpty()) {
 	               productRepository.deleteAll(products);
-	               System.out.println("✅ Deleted all products of adminId: " + adminId);
+	               System.out.println("Deleted all products of adminId: " + adminId);
 	           }
 
-	           // ✅ Step 2: Delete the admin
 	           adminRepository.deleteById(adminId);
-	           System.out.println("✅ Admin deleted successfully: " + adminId);
+	           System.out.println("Admin deleted successfully: " + adminId);
 
 	           return ResponseEntity.ok("Admin and all associated products deleted successfully!");
 	       } catch (Exception e) {
-	           System.err.println("❌ Error deleting admin: " + e.getMessage());
+	           System.err.println(" Error deleting admin: " + e.getMessage());
 	           e.printStackTrace();
 	           return ResponseEntity.status(500).body("Error deleting admin: " + e.getMessage());
 	       }
@@ -69,9 +67,8 @@ public class AdminController {
 	   @GetMapping("/download-csv/{adminId}")
 	    public ResponseEntity<?> downloadAdminProductsCSV(@PathVariable int adminId) {
 	        try {
-	            System.out.println("🔹 Request received to download CSV for adminId: " + adminId);
+	            System.out.println(" Request received to download CSV for adminId: " + adminId);
 
-	            // ✅ Fetch products belonging to the admin
 	            List<Product> products = productRepository.findByAdminid(String.valueOf(adminId));
 
 	            if (products.isEmpty()) {
@@ -79,11 +76,9 @@ public class AdminController {
 	                return ResponseEntity.badRequest().body("No products found for this admin.");
 	            }
 
-	            // ✅ Generate CSV content
 	            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 	            PrintWriter writer = new PrintWriter(outputStream);
 
-	            // ✅ CSV Header (including category & subcategory details)
 	            writer.println("Product Name,Details,Price,Image URLs,Category ID,Subcategory ID,Category Name,Subcategory Name");
 
 	            for (Product product : products) {
@@ -91,20 +86,16 @@ public class AdminController {
 	                String details = escapeCSV(product.getDetails());
 	                String price = (product.getPrice() != null) ? product.getPrice().toString() : "0";
 
-	                // ✅ Convert image URLs to string (handle null cases)
 	                String imageUrls = (product.getImageUrls() != null && !product.getImageUrls().isEmpty())
 	                        ? "\"" + String.join(" | ", product.getImageUrls()) + "\""
 	                        : "\"\"";
 
-	                // ✅ Ensure category ID and subcategory ID are included
 	                String categoryId = (product.getCategories() != null) ? String.valueOf(product.getCategories().getId()) : "0";
 	                String subcategoryId = (product.getSubCategory() != null) ? String.valueOf(product.getSubCategory().getId()) : "0";
 
-	                // ✅ Include category and subcategory names for reference
 	                String categoryName = (product.getCategories() != null) ? escapeCSV(product.getCategories().getName()) : "Unknown";
 	                String subcategoryName = (product.getSubCategory() != null) ? escapeCSV(product.getSubCategory().getName()) : "Unknown";
 
-	                // ✅ Write row to CSV
 	                writer.println(name + "," + details + "," + price + "," + imageUrls + "," + categoryId + "," + subcategoryId + "," + categoryName + "," + subcategoryName);
 	            }
 
@@ -114,7 +105,7 @@ public class AdminController {
 	            byte[] csvBytes = outputStream.toByteArray();
 	            String filename = "admin_products_" + adminId + ".csv";
 
-	            System.out.println("✅ CSV file generated successfully for adminId: " + adminId);
+	            System.out.println("CSV file generated successfully for adminId: " + adminId);
 
 	            return ResponseEntity.ok()
 	                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
@@ -122,7 +113,7 @@ public class AdminController {
 	                    .body(csvBytes);
 
 	        } catch (Exception e) {
-	            System.err.println("❌ Error generating CSV file for adminId " + adminId + ": " + e.getMessage());
+	            System.err.println(" Error generating CSV file for adminId " + adminId + ": " + e.getMessage());
 	            e.printStackTrace();
 	            return ResponseEntity.status(500).body("Error generating CSV file: " + e.getMessage());
 	        }

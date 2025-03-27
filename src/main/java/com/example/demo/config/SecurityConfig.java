@@ -31,6 +31,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
             		.requestMatchers("/admin/register", "/admin/login","api/products/update/*","/auth/google",
             				"/api/products/all","/api/products/save-category","/api/products/save-subcategory",
+            				"/api/products/categories/*","/api/products/subcategories/*","/api/stores/add",
+            				"/api/stores/admin/*","/api/stores/*","/api/stores/product/*",
+            				"/admin/download-categories/*","/admin/download-subcategories/*","/admin/download-products/*",
             				"/api/products/toggle-active/*","/admin/list/*","api/products/*","/admin/request-delete/*",
             				"/admin/download-csv/*","/admin/confirm-delete/*",
             				"/api/products/save-product").permitAll()

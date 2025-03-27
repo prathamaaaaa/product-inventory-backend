@@ -47,9 +47,8 @@ public class AddContoller {
 	    public ResponseEntity<String> uploadCSV(@RequestBody List<Map<String, Object>> productList) {
 	        try {
 	            for (Map<String, Object> productData : productList) {
-	                System.out.println("Received Product Data: " + productData); // 🔥 Debugging Line
+	                System.out.println("Received Product Data: " + productData); 
 
-	                // Check for missing fields
 	                if (!productData.containsKey("name") || !productData.containsKey("details") ||
 	                    !productData.containsKey("price") || !productData.containsKey("imageUrls") ||
 	                    !productData.containsKey("categoryId") || !productData.containsKey("subcategoryId") ||
@@ -62,7 +61,6 @@ public class AddContoller {
 	                BigDecimal price = new BigDecimal(productData.get("price").toString());
 	                String adminId = productData.get("adminId").toString().trim();
 
-	                // Convert Image URLs to List<String>
 	                List<String> imageUrlsList = productData.get("imageUrls") instanceof List ?
 	                        (List<String>) productData.get("imageUrls") :
 	                        List.of(productData.get("imageUrls").toString().split(" \\| "));
@@ -70,14 +68,12 @@ public class AddContoller {
 	                int categoryId = Integer.parseInt(productData.get("categoryId").toString());
 	                int subcategoryId = Integer.parseInt(productData.get("subcategoryId").toString());
 
-	                // Fetch Category & Subcategory
 	                Categories category = categoryRepository.findById(categoryId)
 	                        .orElseThrow(() -> new RuntimeException("Category not found: " + categoryId));
 
 	                subCategories subcategory = subCategoryRepository.findById(subcategoryId)
 	                        .orElseThrow(() -> new RuntimeException("Subcategory not found: " + subcategoryId));
 
-	                // Create & Save Product
 	                Product product = new Product();
 	                product.setName(name);
 	                product.setDetails(details);
@@ -97,12 +93,26 @@ public class AddContoller {
 	    }
 
     @PostMapping("/save-category")
-    public ResponseEntity<String> saveCategory(@RequestBody List<String> categoryNames) {
+    public ResponseEntity<String> saveCategory(@RequestBody Map<String, Object> request) throws Exception {
+    	
+    	 List<String> categoryNames = (List<String>) request.get("categoryNames");
+         String adminId =  request.get("adminId").toString();
+         String storeId =  request.get("storeId").toString();
+
+         if ( storeId.equals(null)) {
+        	 throw new Exception("customer not found");
+         } 
+   	  if ( adminId.equals(null)) {
+				throw new Exception("customer not found");
+			} 
+   	  
         for (String name : categoryNames) {
             if (name != null && !name.trim().isEmpty()) {
             	
                 Categories category = new Categories();
                 category.setName(name.trim());
+                category.setAdminid(adminId);
+                category.setStoreid(storeId);
                 categoryRepository.save(category);
             }
         }
@@ -113,7 +123,15 @@ public class AddContoller {
         try {
             int categoryId = Integer.parseInt(request.get("categoryId").toString());  // ✅ Convert String to Integer safely
             List<String> subcategoryNames = (List<String>) request.get("subcategoryNames");
+            String adminId =  request.get("adminId").toString();
+            String storeId =  request.get("storeId").toString();
 
+            if ( storeId.equals(null)) {
+           	 throw new Exception("customer not found");
+            } 
+      	  if ( adminId.equals(null)) {
+				throw new Exception("customer not found");
+			} 
             Optional<Categories> categoriesOpt = categoryRepository.findById(categoryId);
             if (categoriesOpt.isPresent()) {
                 Categories category = categoriesOpt.get();
@@ -122,6 +140,8 @@ public class AddContoller {
                         subCategories subcategory = new subCategories();
                         subcategory.setName(subcategoryName.trim());
                         subcategory.setCategories(category);
+                        subcategory.setAdminid(adminId);
+                        subcategory.setStoreid(storeId);
                         subCategoryRepository.save(subcategory);
                     }
                 }
@@ -155,7 +175,11 @@ public class AddContoller {
             int categoryId = Integer.parseInt(request.get("categoryId").toString());
             int subcategoryId = Integer.parseInt(request.get("subcategoryId").toString());
             String adminId =  request.get("adminId").toString();
-            
+            String storeId =  request.get("storeId").toString();
+
+            if ( storeId.equals(null)) {
+           	 throw new Exception("customer not found");
+            } 
         	  if ( adminId.equals(null)) {
   				throw new Exception("customer not found");
   			} 
@@ -203,6 +227,7 @@ public class AddContoller {
 //                    product.setImageUrls(imageUrls);
                     product.setActive(active);
                     product.setAdminid(adminId);
+                    product.setStoreid(storeId);
                     System.out.println(adminId);
                     System.out.println(product.getAdminid());
                     System.out.println(active+"aviuyfcgvhbjnk");

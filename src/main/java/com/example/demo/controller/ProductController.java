@@ -44,7 +44,8 @@ public class ProductController {
                 product.getImageUrls() ,
                 product.getDetails(),
                 product.isActive(),
-                product.getAdminid()            
+                product.getAdminid(),
+                product.getStoreid()
                 )
             ).collect(Collectors.toList());
         List<CategoryDTO> categories = categoryRepository.findAll().stream().map(CategoryDTO::new).toList();
@@ -73,7 +74,8 @@ public class ProductController {
             product.getImageUrls(),
             product.getDetails(),
             product.isActive(),
-            product.getAdminid()
+            product.getAdminid(),
+            product.getStoreid()
         );
 
         
