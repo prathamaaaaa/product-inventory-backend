@@ -13,5 +13,6 @@ public interface CategoryRepository extends JpaRepository<Categories, Integer> {
 	List<Categories> findByAdminid(String valueOf);
 
     Categories deleteById(int id);
+	List<Categories> findByStoreid(String storeId);
 
 }

@@ -42,55 +42,60 @@ public class AddContoller {
 	    @Autowired
 	    private AdminRepository adminRepository;
 	    
-	    @PostMapping("/upload-csv")
-	    @CrossOrigin(origins = "http://localhost:5173")
-	    public ResponseEntity<String> uploadCSV(@RequestBody List<Map<String, Object>> productList) {
-	        try {
-	            for (Map<String, Object> productData : productList) {
-	                System.out.println("Received Product Data: " + productData); 
+	
+	  @PostMapping("/upload-csv")
+@CrossOrigin(origins = "http://localhost:5173")
+public ResponseEntity<String> uploadCSV(@RequestBody List<Map<String, Object>> productList) {
+    try {
+        for (Map<String, Object> productData : productList) {
+            System.out.println("Received Product Data: " + productData); 
 
-	                if (!productData.containsKey("name") || !productData.containsKey("details") ||
-	                    !productData.containsKey("price") || !productData.containsKey("imageUrls") ||
-	                    !productData.containsKey("categoryId") || !productData.containsKey("subcategoryId") ||
-	                    !productData.containsKey("adminId")) {
-	                    return ResponseEntity.badRequest().body("Error: Missing required fields.");
-	                }
+            String name = productData.getOrDefault("name", "").toString().trim();
+            String details = productData.getOrDefault("details", "").toString().trim();
+            String priceStr = productData.get("price") != null ? productData.get("price").toString() : "0";
+            BigDecimal price = new BigDecimal(priceStr);
 
-	                String name = productData.get("name").toString().trim();
-	                String details = productData.get("details").toString().trim();
-	                BigDecimal price = new BigDecimal(productData.get("price").toString());
-	                String adminId = productData.get("adminId").toString().trim();
+            String adminId = productData.getOrDefault("adminId", "").toString().trim();
+            int categoryId = productData.get("categoryId") != null ? Integer.parseInt(productData.get("categoryId").toString()) : -1;
+            int subcategoryId = productData.get("subcategoryId") != null ? Integer.parseInt(productData.get("subcategoryId").toString()) : -1;
+            String storeId = productData.getOrDefault("storeId", "").toString().trim();
 
-	                List<String> imageUrlsList = productData.get("imageUrls") instanceof List ?
-	                        (List<String>) productData.get("imageUrls") :
-	                        List.of(productData.get("imageUrls").toString().split(" \\| "));
+            if (categoryId == -1 || subcategoryId == -1) {
+                return ResponseEntity.badRequest().body("Error: Missing categoryId or subcategoryId.");
+            }
 
-	                int categoryId = Integer.parseInt(productData.get("categoryId").toString());
-	                int subcategoryId = Integer.parseInt(productData.get("subcategoryId").toString());
+            if (adminId.isEmpty() || storeId.isEmpty()) {
+                return ResponseEntity.badRequest().body("Error: Admin ID or Store ID is missing.");
+            }
 
-	                Categories category = categoryRepository.findById(categoryId)
-	                        .orElseThrow(() -> new RuntimeException("Category not found: " + categoryId));
+            List<String> imageUrlsList = productData.get("imageUrls") instanceof List
+                    ? (List<String>) productData.get("imageUrls")
+                    : List.of(productData.getOrDefault("imageUrls", "").toString().split(" \\| "));
 
-	                subCategories subcategory = subCategoryRepository.findById(subcategoryId)
-	                        .orElseThrow(() -> new RuntimeException("Subcategory not found: " + subcategoryId));
+            Categories category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("Category not found: " + categoryId));
 
-	                Product product = new Product();
-	                product.setName(name);
-	                product.setDetails(details);
-	                product.setPrice(price);
-	                product.setCategories(category);
-	                product.setSubCategory(subcategory);
-	                product.setImageUrls(imageUrlsList);
-	                product.setAdminid(adminId);
-	                product.setActive(true);
+            subCategories subcategory = subCategoryRepository.findById(subcategoryId)
+                    .orElseThrow(() -> new RuntimeException("Subcategory not found: " + subcategoryId));
 
-	                productRepository.save(product);
-	            }
-	            return ResponseEntity.ok("CSV products uploaded successfully!");
-	        } catch (Exception e) {
-	            return ResponseEntity.badRequest().body("Error processing CSV file: " + e.getMessage());
-	        }
-	    }
+            Product product = new Product();
+            product.setName(name);
+            product.setDetails(details);
+            product.setPrice(price);
+            product.setCategories(category);
+            product.setSubCategory(subcategory);
+            product.setImageUrls(imageUrlsList);
+            product.setAdminid(adminId);
+            product.setStoreid(storeId);
+            product.setActive(true);
+
+            productRepository.save(product);
+        }
+        return ResponseEntity.ok("CSV products uploaded successfully!");
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body("Error processing CSV file: " + e.getMessage());
+    }
+}
 
     @PostMapping("/save-category")
     public ResponseEntity<String> saveCategory(@RequestBody Map<String, Object> request) throws Exception {
@@ -268,7 +273,8 @@ public class AddContoller {
             if (existingProduct == null) {
                 return ResponseEntity.badRequest().body("Product not found.");
             }
-
+            String storeId =  request.get("storeId").toString();
+            System.out.println(storeId);
             if (!request.containsKey("name") || !request.containsKey("details") || !request.containsKey("price") || 
                 !request.containsKey("categoryId") || !request.containsKey("subcategoryId") || !request.containsKey("adminId")) {
                 return ResponseEntity.badRequest().body("Missing required fields.");
@@ -276,7 +282,10 @@ public class AddContoller {
             String name = (String) request.get("name");
             String details = (String) request.get("details");
             BigDecimal price = new BigDecimal(request.get("price").toString());
-
+            System.out.println("stor iddddd"+storeId);
+            if ( storeId.equals(null)) {
+           	 throw new Exception("customer not found");
+            } 
             int categoryId = Integer.parseInt(request.get("categoryId").toString());
             int subcategoryId = Integer.parseInt(request.get("subcategoryId").toString());
             String adminId =  request.get("adminId").toString();
@@ -306,6 +315,7 @@ public class AddContoller {
             existingProduct.setImageUrls(imageUrls);
             existingProduct.setActive(active); 
             existingProduct.setAdminid(adminId);
+            existingProduct.setStoreid(storeId);
             Product savedProduct = productRepository.save(existingProduct);
             return ResponseEntity.ok(savedProduct);
         } catch (Exception e) {

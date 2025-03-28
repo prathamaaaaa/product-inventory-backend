@@ -32,10 +32,10 @@ public class SecurityConfig {
             		.requestMatchers("/admin/register", "/admin/login","api/products/update/*","/auth/google",
             				"/api/products/all","/api/products/save-category","/api/products/save-subcategory",
             				"/api/products/categories/*","/api/products/subcategories/*","/api/stores/add",
-            				"/api/stores/admin/*","/api/stores/*","/api/stores/product/*",
+            				"/api/stores/admin/*","/api/stores/*","/api/stores/product/*","/api/stores/download-csv/*",
             				"/admin/download-categories/*","/admin/download-subcategories/*","/admin/download-products/*",
             				"/api/products/toggle-active/*","/admin/list/*","api/products/*","/admin/request-delete/*",
-            				"/admin/download-csv/*","/admin/confirm-delete/*",
+            				"/admin/download-csv/*","/admin/confirm-delete/*","/api/stores/delete/*",
             				"/api/products/save-product").permitAll()
             		.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()

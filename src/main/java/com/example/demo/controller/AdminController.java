@@ -92,6 +92,7 @@ public class AdminController {
 
 	                String categoryId = (product.getCategories() != null) ? String.valueOf(product.getCategories().getId()) : "0";
 	                String subcategoryId = (product.getSubCategory() != null) ? String.valueOf(product.getSubCategory().getId()) : "0";
+//	                String storeId = (product.getStoreid() != null) ? String.valueOf(product.getStoreid().g()) : "0";
 
 	                String categoryName = (product.getCategories() != null) ? escapeCSV(product.getCategories().getName()) : "Unknown";
 	                String subcategoryName = (product.getSubCategory() != null) ? escapeCSV(product.getSubCategory().getName()) : "Unknown";

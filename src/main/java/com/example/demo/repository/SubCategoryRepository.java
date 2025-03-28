@@ -13,5 +13,6 @@ public interface SubCategoryRepository extends JpaRepository<subCategories,Integ
     subCategories deleteById(int id);
 
 //	List<subCategories> findSubCategoriesByAdminId(int adminId);
+	List<subCategories> findByStoreid(String storeId);
 
 }
