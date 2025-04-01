@@ -26,21 +26,16 @@ public class AdminService {
     private JwtUtil jwtUtil;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // ✅ Correct way
+    private PasswordEncoder passwordEncoder; 
     
-    
-
     public String registerAdmin(Admin admin) {
         if (adminRepository.existsByEmail(admin.getEmail())) {
             throw new RuntimeException("Email already exists!");
         }
-        
-        System.out.println(admin+"adminnsksnd");
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         adminRepository.save(admin);
         return "Admin registered successfully!";
     }
-
 
     public Map<String, Object> loginAdmin(String email, String password) {
         Optional<Admin> admin = adminRepository.findByEmail(email);
@@ -53,20 +48,19 @@ public class AdminService {
                 System.out.println("success");
 
                 String token = jwtUtil.generateToken(email);
-
+                adminData.setToken(token);
+                adminRepository.save(adminData);
                 Map<String, Object> response = new HashMap<>();
                 response.put("id", adminData.getId());
                 response.put("name", adminData.getName());
                 response.put("email", adminData.getEmail());
                 response.put("token", token); 
-                System.out.println("🔥 Sending response: " + response); 
+                System.out.println("Sending response: " + response); 
                 return response;
             }
         }
         return null; 
-    }
-    
-    
+    }    
     public void deleteProduct(int id) {
         productRepository.deleteById(id);
     }

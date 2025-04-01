@@ -26,6 +26,7 @@ public class Admin {
 	
 	private String password;
 	
+	private String token;
 //	@JsonManagedReference
 //    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<Product> products;
@@ -38,6 +39,14 @@ public class Admin {
 //	public void setProducts(List<Product> products) {
 //		this.products = products;
 //	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
 
 	public int getId() {
 		return id;
@@ -70,5 +79,7 @@ public class Admin {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+
 	
 }

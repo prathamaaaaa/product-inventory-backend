@@ -25,6 +25,7 @@ import com.example.demo.repository.AdminRepository;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.SubCategoryRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @RestController
@@ -32,7 +33,7 @@ import com.example.demo.repository.SubCategoryRepository;
 @RequestMapping("/api/products")
 public class AddContoller {
 	
-	 @Autowired
+	    @Autowired
 	    private ProductRepository productRepository;
 	    @Autowired
 	    private CategoryRepository categoryRepository;
@@ -42,8 +43,7 @@ public class AddContoller {
 	    @Autowired
 	    private AdminRepository adminRepository;
 	    
-	
-	  @PostMapping("/upload-csv")
+@PostMapping("/upload-csv")
 @CrossOrigin(origins = "http://localhost:5173")
 public ResponseEntity<String> uploadCSV(@RequestBody List<Map<String, Object>> productList) {
     try {
@@ -195,7 +195,10 @@ public ResponseEntity<String> uploadCSV(@RequestBody List<Map<String, Object>> p
             boolean active = request.containsKey("active") ? Boolean.parseBoolean(request.get("active").toString()) : true;
             
             
-            List<String> productNames = (List<String>) request.getOrDefault("productNames", Collections.emptyList());
+//            List<String> productNames = (List<String>) request.getOrDefault("productNames", Collections.emptyList());
+            List<Map<String, String>> productNames = (List<Map<String, String>>) request.getOrDefault("productNames", Collections.emptyList());
+            
+            
             List<String> details = (List<String>) request.getOrDefault("details", Collections.emptyList());
             List<Number> priceNumbers = (List<Number>) request.getOrDefault("prices", Collections.emptyList());
             List<BigDecimal> prices = priceNumbers.stream()
@@ -216,15 +219,22 @@ public ResponseEntity<String> uploadCSV(@RequestBody List<Map<String, Object>> p
 
             Categories category = categoriesOptional.get();
             subCategories subcategory = subCategoriesOptional.get();
-
+         
+            
+            
+            ObjectMapper objectMapper = new ObjectMapper(); 
+            
+            
             System.out.println(adminId);
             for (int i = 0; i < productNames.size(); i++) {
-                String productName = productNames.get(i);
+                Map<String, String> productName = productNames.get(i);
+                String jsonProductName = objectMapper.writeValueAsString(productName);
+
                 String detail = details.get(i);
                 BigDecimal price = (i < prices.size()) ? prices.get(i) : BigDecimal.ZERO;
-                if (productName != null && !productName.trim().isEmpty()) {
+                if (productName != null ) {
                     Product product = new Product();
-                    product.setName(productName.trim());
+                    product.setName(jsonProductName); 
                     product.setDetails(detail.trim());
                     product.setCategories(category);
                     product.setSubCategory(subcategory);

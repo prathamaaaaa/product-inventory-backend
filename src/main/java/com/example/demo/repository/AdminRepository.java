@@ -8,6 +8,5 @@ public interface AdminRepository extends JpaRepository<Admin, Integer> {
     Optional<Admin> findByEmail(String email);
     Admin findById(int id);
     boolean existsByEmail(String email);
-    
     Admin deleteById(int id);
 }

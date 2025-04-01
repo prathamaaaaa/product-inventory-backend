@@ -36,8 +36,8 @@ public class AdminController {
 	   private String escapeCSV(String data) {
 		    if (data == null) return "";
 		    if (data.contains("\"") || data.contains(",") || data.contains("\n")) {
-		        data = data.replace("\"", "\"\""); // Escape quotes by doubling them
-		        return "\"" + data + "\""; // Wrap the whole field in quotes
+		        data = data.replace("\"", "\"\""); 
+		        return "\"" + data + "\"";
 		    }
 		    return data;
 		}
@@ -143,19 +143,7 @@ public class AdminController {
         }
         return ResponseEntity.ok(response);
     }
-    
-//    @PostMapping("/request-delete/{id}")
-//    public ResponseEntity<?> requestAdminDeletion(@PathVariable int adminId) {
-//		
-//    	
-//    	
-//    	System.out.println(adminId);
-//    	
-//    	return null;
-//    
-//    	
-//    }
-    
+   
     @DeleteMapping("/list/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable int id) {
         adminService.deleteProduct(id);

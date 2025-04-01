@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.jwt.JwtUtil;
+import com.example.demo.repository.AdminRepository;
 import com.example.demo.service.GoogleAuthService;
 
 @RestController
@@ -27,7 +28,7 @@ public class GoogleAuthController {
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> request) {
         String idToken = request.get("token");
         Map<String, Object> adminData = googleAuthService.verifyGoogleToken(idToken);
-
+       
         if (adminData != null) {
             return ResponseEntity.ok(adminData); 
         } else {

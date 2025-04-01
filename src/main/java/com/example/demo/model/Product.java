@@ -24,8 +24,9 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     
-    private String name;
-    
+
+    @Column(columnDefinition = "JSON")
+    private String name;      
     private String adminid;
     
     @Column(precision = 10, scale = 0)
