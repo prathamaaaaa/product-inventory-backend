@@ -35,7 +35,7 @@ public class SecurityConfig {
             				"/api/stores/admin/*","/api/stores/*","/api/stores/product/*","/api/stores/download-csv/*",
             				"/admin/download-categories/*","/admin/download-subcategories/*","/admin/download-products/*",
             				"/api/products/toggle-active/*","/admin/list/*","api/products/*","/admin/request-delete/*",
-            				"/admin/download-csv/*","/admin/confirm-delete/*","/api/stores/delete/*","/locale/*",
+            				"/admin/download-csv/*","/admin/confirm-delete/*","/api/stores/delete/*","/locale/*","/api/stores/add/",
             				"/api/products/save-product").permitAll()
             		.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()

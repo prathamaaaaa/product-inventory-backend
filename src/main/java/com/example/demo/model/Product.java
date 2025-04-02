@@ -44,7 +44,7 @@ public class Product {
     
     private String details;
 
-    private String storeid;
+    private String storeid;	
     public String getStoreid() {
 		return storeid;
 	}

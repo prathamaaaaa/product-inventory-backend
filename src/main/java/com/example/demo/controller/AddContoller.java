@@ -25,6 +25,7 @@ import com.example.demo.repository.AdminRepository;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.SubCategoryRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
@@ -285,11 +286,34 @@ public ResponseEntity<String> uploadCSV(@RequestBody List<Map<String, Object>> p
             }
             String storeId =  request.get("storeId").toString();
             System.out.println(storeId);
-            if (!request.containsKey("name") || !request.containsKey("details") || !request.containsKey("price") || 
+            if (!request.containsKey("productNames") || !request.containsKey("details") || !request.containsKey("price") || 
                 !request.containsKey("categoryId") || !request.containsKey("subcategoryId") || !request.containsKey("adminId")) {
                 return ResponseEntity.badRequest().body("Missing required fields.");
             }
-            String name = (String) request.get("name");
+//            String name = (String) request.get("name");
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            List<Map<String, String>> productNames = (List<Map<String, String>>) request.getOrDefault("productNames", Collections.emptyList());
+
+
+            // ✅ Extract `productNames` as a single JSON object
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonProductName = objectMapper.writeValueAsString(request.get("productNames"));
+
+//            if (productNamesObject == null) {
+//                return ResponseEntity.badRequest().body("Product names cannot be null.");
+//            }
+//            if (productNamesObject instanceof String) {
+//                name = objectMapper.readValue((String) productNamesObject, new TypeReference<Map<String, String>>() {});
+//            } else if (productNamesObject instanceof Map) {
+//                name = (Map<String, String>) productNamesObject;
+//            } else {
+//                return ResponseEntity.badRequest().body("Invalid productNames format.");
+//            }
+
+
+
+//            
+            
             String details = (String) request.get("details");
             BigDecimal price = new BigDecimal(request.get("price").toString());
             System.out.println("stor iddddd"+storeId);
@@ -300,7 +324,7 @@ public ResponseEntity<String> uploadCSV(@RequestBody List<Map<String, Object>> p
             int subcategoryId = Integer.parseInt(request.get("subcategoryId").toString());
             String adminId =  request.get("adminId").toString();
             
-            if (name.isEmpty() || details.isEmpty() || adminId.isEmpty()) {
+            if (details.isEmpty() || adminId.isEmpty()) {
                 return ResponseEntity.badRequest().body("Fields cannot be empty.");
             }
             
@@ -315,9 +339,12 @@ public ResponseEntity<String> uploadCSV(@RequestBody List<Map<String, Object>> p
             subCategories subcategory = subCategoryRepository.findById(subcategoryId)
                 .orElseThrow(() -> new RuntimeException("Subcategory not found with ID: " + subcategoryId));
             boolean active = request.containsKey("active") ? Boolean.parseBoolean(request.get("active").toString()) : existingProduct.isActive();
+//            Map<String, String> productName = name.get(i);
+            
 
-     
-            existingProduct.setName(name);
+//            String jsonProductName = objectMapper.writeValueAsString(productNamesObject);
+            System.out.println(jsonProductName);
+            existingProduct.setName(jsonProductName);
             existingProduct.setDetails(details);
             existingProduct.setPrice(price);
             existingProduct.setCategories(category);
@@ -327,7 +354,7 @@ public ResponseEntity<String> uploadCSV(@RequestBody List<Map<String, Object>> p
             existingProduct.setAdminid(adminId);
             existingProduct.setStoreid(storeId);
             Product savedProduct = productRepository.save(existingProduct);
-            return ResponseEntity.ok(savedProduct);
+            return ResponseEntity.ok("saves");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error updating product: " + e.getMessage());
         }
@@ -342,7 +369,7 @@ public ResponseEntity<String> uploadCSV(@RequestBody List<Map<String, Object>> p
             System.out.println("producy"+product);
                
 
-            product.setActive(!product.isActive()); // 🔥 Toggle the status (true ↔ false)
+            product.setActive(!product.isActive());
             productRepository.save(product);
 
             return ResponseEntity.ok("Product active status updated successfully.");

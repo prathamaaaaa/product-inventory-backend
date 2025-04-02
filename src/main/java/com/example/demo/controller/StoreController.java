@@ -21,13 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.CategoryDTO;
 import com.example.demo.dto.ProductDTO;
 import com.example.demo.dto.SubCategoryDTO;
+import com.example.demo.model.Admin;
 import com.example.demo.model.Product;
 import com.example.demo.model.Store;
+import com.example.demo.repository.AdminRepository;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.StoreRepository;
 import com.example.demo.repository.SubCategoryRepository;
 import com.example.demo.service.CsvService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -53,7 +58,9 @@ public class StoreController {
     
     @Autowired
 	private CsvService csvService;
- 
+    
+    @Autowired
+    private AdminRepository adminRepository;
     
     @GetMapping("/download-csv/{storeId}")
     public ResponseEntity<ByteArrayResource> downloadProductsCSV(@PathVariable String storeId) {
@@ -95,16 +102,42 @@ public class StoreController {
 
 
 
-
-    @PostMapping("/add")
-    public ResponseEntity<String> addStore(@RequestBody Store store) {
-        if (store.getName() == null || store.getName().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Store name cannot be empty");
-        }
-        storeRepository.save(store);
-        return ResponseEntity.ok("Store created successfully");
-    }
+//
+//    @PostMapping("/add")
+//    public ResponseEntity<String> addStore(@RequestBody Store store) {
+//    	System.out.println(store);
+//        if (store.getName() == null || store.getName().trim().isEmpty()) {
+//            return ResponseEntity.badRequest().body("Store name cannot be empty");
+//        }
+//        storeRepository.save(store);
+//        return ResponseEntity.ok("Store created successfully");
+//    }
     
+    @PostMapping("/add")
+    public ResponseEntity<?> createStore(@RequestBody Map<String, Object> request) {
+        try {
+            String adminId = request.get("adminid").toString();
+//            String admin = adminRepository.findById(adminId);
+
+        
+            ObjectMapper objectMapper = new ObjectMapper(); 
+
+
+            // Parse `name` from JSON string
+            String nameJsonStr = request.get("name").toString();
+            JsonNode nameJson = objectMapper.readTree(nameJsonStr);
+
+            Store store = new Store();
+            store.setAdminid(adminId);
+            store.setName(nameJsonStr); // Save JSON
+
+            storeRepository.save(store);
+            return ResponseEntity.ok("Store created successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/admin/{adminId}")
     public ResponseEntity<List<Store>> getStoresByAdmin(@PathVariable String adminId) {
         List<Store> stores = storeRepository.findByAdminid(adminId);
