@@ -43,18 +43,17 @@ public class GoogleAuthService {
                 if (adminOpt.isPresent()) {
                     Admin adminData = adminOpt.get();
                     String token = jwtUtil.generateToken(email);
-
-                    // ✅ Prepare response
                     Map<String, Object> response = new HashMap<>();
                     response.put("id", adminData.getId());
                     response.put("name", adminData.getName());
                     response.put("email", adminData.getEmail());
                     response.put("token", token);
-
-                    System.out.println("🔥 Sending response: " + response);
+                    adminData.setToken(token);
+                    adminRepository.save(adminData);
+                    System.out.println("Sending response: " + response);
                     return response;
                 } else {
-                    System.out.println("❌ Admin not found!");
+                    System.out.println("Admin not found!");
                 }
             }
         } catch (Exception e) {

@@ -123,7 +123,7 @@ public class AdminController {
 	   
 	   @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
 	   public ResponseEntity<String> register(@RequestBody Admin admin) {
-	       System.out.println("Received admin object: " + admin); // Add this line
+	       System.out.println("Received admin object: " + admin);
 	       try {
 	           adminService.registerAdmin(admin);
 	           return ResponseEntity.ok("Admin registered successfully!");

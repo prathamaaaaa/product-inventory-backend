@@ -54,6 +54,8 @@ public class AdminService {
                 response.put("id", adminData.getId());
                 response.put("name", adminData.getName());
                 response.put("email", adminData.getEmail());
+                response.put("role", adminData.getRole());
+
                 response.put("token", token); 
                 System.out.println("Sending response: " + response); 
                 return response;
