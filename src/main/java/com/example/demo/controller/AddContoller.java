@@ -1,15 +1,18 @@
 package com.example.demo.controller;
 
 import java.math.BigDecimal;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,11 +20,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.CartDTO;
 import com.example.demo.model.Admin;
+import com.example.demo.model.Cart;
 import com.example.demo.model.Categories;
 import com.example.demo.model.Product;
 import com.example.demo.model.subCategories;
 import com.example.demo.repository.AdminRepository;
+import com.example.demo.repository.CartRepository;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.SubCategoryRepository;
@@ -43,6 +49,117 @@ public class AddContoller {
 	    
 	    @Autowired
 	    private AdminRepository adminRepository;
+	    
+	    @Autowired
+	    private CartRepository cartRepository;
+	    @DeleteMapping("/cart/{id}")
+	    public ResponseEntity<String> deleteCartItem(@PathVariable int id) {
+	        try {
+	            Optional<Cart> cartItem = cartRepository.findByProductid(id);
+	            if (cartItem.isPresent()) {
+	                cartRepository.delete(cartItem.get());
+	                return ResponseEntity.ok("Cart item deleted successfully");
+	            } else {
+	                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("Cart item not found");
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error deleting cart item: " + e.getMessage());
+	        }
+	    }	
+
+	    @PostMapping("/cart")
+	    public ResponseEntity<String> addToCart(@RequestBody Map<String, Object> cart) {
+	        try {
+	            if (!cart.containsKey("productid") || !cart.containsKey("quantity")) {
+	                return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("Missing product ID or quantity");
+	            }
+
+	            int productid = (int) cart.get("productid");
+	            String productname = cart.get("productname").toString();
+	            int quantity = (int) cart.get("quantity");
+	            int userid = (int) cart.get("userid");
+System.out.println(quantity+"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
+	            ObjectMapper objectMapper = new ObjectMapper();
+	            Map<String, String> productMap = objectMapper.readValue(productname, Map.class);
+
+	            // Access values
+	            System.out.println("English Name: " + productMap.get("en")); // Laptop
+	            String englishname = productMap.get("en");
+	            Optional<Cart> existingCartItem = cartRepository.findByProductid(productid);
+	            System.out.println(existingCartItem);
+	            if (existingCartItem.isPresent()) {
+	                Cart cartItem = existingCartItem.get();
+	                cartItem.setQuantity(quantity);
+		            System.out.println(cartItem.getQuantity());
+
+	                cartRepository.save(cartItem);
+	                return ResponseEntity.ok("Cart item quantity updated");
+	            } else {
+	                Cart newCartItem = new Cart();
+	                newCartItem.setProductid(productid);
+	                newCartItem.setQuantity(quantity);
+	                newCartItem.setProductname(englishname);
+	                newCartItem.setUserid(userid);
+
+	                cartRepository.save(newCartItem);
+	                return ResponseEntity.ok("Cart item added");
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("Invalid cart data");
+	        }
+	    }
+
+	    
+
+	    @PostMapping("/cart/bulk")
+	    public ResponseEntity<String> addLocalCartToDatabase(@RequestBody Map<String, Object> data) {
+	    	System.out.println(data);
+	        try {
+	            System.out.println("Received cart data: " + data);
+
+	            Integer userId = (data.get("userid") instanceof Number) ? ((Number) data.get("userid")).intValue() : null;
+	            if (userId == null) {
+	                return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("Invalid user ID");
+	            }
+
+	            List<Map<String, Object>> cartItems = (List<Map<String, Object>>) data.get("cartItems");
+	            if (cartItems == null || cartItems.isEmpty()) {
+	                return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("Cart items are missing or empty");
+	            }
+
+	            for (Map<String, Object> item : cartItems) {
+	                System.out.println("Processing cart item: " + item);
+
+	                Integer productid = (item.get("productid") instanceof Number) ? ((Number) item.get("productid")).intValue() : null;
+	                String productname = (item.get("productname") instanceof String) ? (String) item.get("productname") : null;
+	                Integer quantity = (item.get("quantity") instanceof Number) ? ((Number) item.get("quantity")).intValue() : null;
+
+	                if (productid == null || productname == null || quantity == null) {
+	                    System.out.println("Skipping invalid cart item: " + item);
+	                    continue;
+	                }
+
+	                Cart existingCartItem = cartRepository.findByUseridAndProductid(userId, productid);
+	                if (existingCartItem != null) {
+	                    existingCartItem.setQuantity(existingCartItem.getQuantity() );
+	                    cartRepository.save(existingCartItem);
+	                } else {
+	                    Cart newCartItem = new Cart();
+	                    newCartItem.setUserid(userId);
+	                    newCartItem.setProductid(productid);
+	                    newCartItem.setProductname(productname);
+	                    newCartItem.setQuantity(quantity);
+	                    cartRepository.save(newCartItem);
+	                }
+	            }
+	            return ResponseEntity.ok("Local cart items synced with database.");
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("Failed to sync local cart to database.");
+	        }
+	    }
 	    
 @PostMapping("/upload-csv")
 @CrossOrigin(origins = "http://localhost:5173")
