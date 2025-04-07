@@ -52,6 +52,7 @@ public class AddContoller {
 	    
 	    @Autowired
 	    private CartRepository cartRepository;
+	    
 	    @DeleteMapping("/cart/{id}")
 	    public ResponseEntity<String> deleteCartItem(@PathVariable int id) {
 	        try {
@@ -79,7 +80,7 @@ public class AddContoller {
 	            String productname = cart.get("productname").toString();
 	            int quantity = (int) cart.get("quantity");
 	            int userid = (int) cart.get("userid");
-System.out.println(quantity+"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
+
 	            ObjectMapper objectMapper = new ObjectMapper();
 	            Map<String, String> productMap = objectMapper.readValue(productname, Map.class);
 
