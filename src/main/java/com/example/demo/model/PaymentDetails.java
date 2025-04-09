@@ -1,5 +1,9 @@
 package com.example.demo.model;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,8 +25,15 @@ public class PaymentDetails {
 	private String orderid;
 	private boolean status;
 	private double amount;
+	@CreationTimestamp
+    private LocalDateTime createdAt;
 	
-	
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 	public double getAmount() {
 		return amount;
 	}

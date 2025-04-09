@@ -71,22 +71,24 @@ public class AddContoller {
 
 	    @PostMapping("/cart")
 	    public ResponseEntity<String> addToCart(@RequestBody Map<String, Object> cart) {
-	        try {
+	        System.out.println(cart);
+	    	try {
 	            if (!cart.containsKey("productid") || !cart.containsKey("quantity")) {
 	                return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("Missing product ID or quantity");
 	            }
 
 	            int productid = (int) cart.get("productid");
-	            String productname = cart.get("productname").toString();
 	            int quantity = (int) cart.get("quantity");
 	            int userid = (int) cart.get("userid");
 
+	            String productname = cart.get("productname").toString();
 	            ObjectMapper objectMapper = new ObjectMapper();
 	            Map<String, String> productMap = objectMapper.readValue(productname, Map.class);
 
-	            // Access values
+	            
 	            System.out.println("English Name: " + productMap.get("en")); // Laptop
 	            String englishname = productMap.get("en");
+	            System.out.println(englishname);
 	            Optional<Cart> existingCartItem = cartRepository.findByProductid(productid);
 	            System.out.println(existingCartItem);
 	            if (existingCartItem.isPresent()) {

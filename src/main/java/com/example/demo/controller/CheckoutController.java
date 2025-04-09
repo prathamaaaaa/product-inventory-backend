@@ -16,9 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.CheckoutDetail;
+import com.example.demo.model.Orders;
 import com.example.demo.model.PaymentDetails;
+import com.example.demo.repository.CartRepository;
 import com.example.demo.repository.CheckoutRepository;
+import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.PaymentRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,8 +31,14 @@ import com.razorpay.Order;
 import com.razorpay.Payment;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
@@ -43,14 +53,23 @@ public class CheckoutController {
 	
 	 @Autowired
 	 private CheckoutRepository checkoutRepository;
+	 
+	 
+	 @Autowired
+	 private OrderRepository orderRepository;
 
 	 @Autowired
 	 private PaymentRepository paymentRepository;
 	 
+	 
+	 @Autowired
+	 private CartRepository cartRepository;
+
 	   private final String key = "rzp_test_k6Pox5bCFlqv8t";
 	    private final String secret = "ZznAUEwNgBzlUpnkF9J29sfs";
 
 	    @PostMapping("/payment-details")
+	    @Transactional
 	    public ResponseEntity<?> savePayment(@RequestBody Map<String, String> paymentPayload) {
 	        System.out.println(paymentPayload);
 
@@ -77,10 +96,66 @@ public class CheckoutController {
 	        	if (orderId != null) existing.setOrderid(orderId);
 	            if (paymentId != null) existing.setPaymentid(paymentId);
 	            if (key != null) existing.setRazopaykey(key);
+	            existing.setCreatedAt(LocalDateTime.now());
 	            if (paymentPayload.containsKey("amount")) existing.setAmount(amount);
 	            existing.setStatus(true);
+	            
+	            
 	            paymentRepository.save(existing);
+	            System.out.println(existing+"eeeeeeeeeeeeeeeeee");
+	            
+	            
+	            String cartItemsJson = paymentPayload.get("cartItems");
+
+	            System.out.println(cartItemsJson);
+	            try {
+	                ObjectMapper mapper = new ObjectMapper();
+	                List<Map<String, Object>> cartItems = mapper.readValue(cartItemsJson, List.class);
+	                for (Map<String, Object> item : cartItems) {
+	                    int productId = (int) item.get("productid");
+	                    int quantity = (int) item.get("quantity");
+	                    System.out.println(item.get("price"));
+	                    int price = (int) item.get("price");
+
+	                    String productname = item.get("productname").toString();
+	    	            ObjectMapper objectMapper = new ObjectMapper();
+	    	            Map<String, String> productMap = objectMapper.readValue(productname, Map.class);
+
+	    	            
+	    	            System.out.println("English Name: " + productMap.get("en")); // Laptop
+	    	            String englishname = productMap.get("en");
+	    	            
+	    	            
+	                    // Optional: If price is passed in cart item
+//	                    if (item.containsKey("price")) {
+//	                        Object priceObj = item.get("price");
+//	                        if (priceObj instanceof Number) {
+//	                            price = ((Number) priceObj).doubleValue();
+//	                        }
+//	                    }
+
+	                    Orders order = new Orders();
+	                    order.setUserid(userId);
+	                   order.setProductname(englishname);
+	                    order.setProductid(productId);
+	                    order.setQuantity(quantity);
+	                    order.setOrderdate(LocalDate.now());
+	                    order.setOrderid(orderId);
+	                    order.setPrice(price); 
+	                    orderRepository.save(order);
+	                }
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to parse cartItems");
+	            }
+
+	            
+	            cartRepository.deleteByUserid(userId);   
+	           
 	            return ResponseEntity.ok("Payment info updated");
+	            
+	            
+	            
 	        } else {
 
 	        	PaymentDetails newEntry = new PaymentDetails();
@@ -89,8 +164,13 @@ public class CheckoutController {
 	            newEntry.setOrderid(orderId);
 	            newEntry.setPaymentid(paymentId);
 	            newEntry.setAmount(amount);
+	            newEntry.setCreatedAt(LocalDateTime.now());
 	            newEntry.setStatus(paymentId != null);
 	            paymentRepository.save(newEntry);
+	            System.out.println(newEntry+"newwwwwwwwwwwwww");
+	            
+
+
 	            return ResponseEntity.ok("New payment entry created");
 	        }
 	    }
