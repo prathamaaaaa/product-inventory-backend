@@ -81,7 +81,7 @@ public class CheckoutController {
 	        String paymentId = paymentPayload.get("paymentid");
 	        String code = paymentPayload.get("couponcode");
 
-	        String key = paymentPayload.get("razorpayKey"); // Use correct key name
+	        String key = paymentPayload.get("razorpayKey");
 	        double amount = 0;
 	        int userId = 0;
 
@@ -119,6 +119,11 @@ public class CheckoutController {
 	            Coupon coupon = couponRepository.findByCode(code);
 	            
 	            coupon.setUsercount(coupon.getUsercount() + 1);
+	            
+	            if (coupon.getUsercount() > 10) {
+					System.out.println("getting");
+					coupon.setActive(false);
+				}
 	            
 	            System.out.println(cartItemsJson);
 	            try {
