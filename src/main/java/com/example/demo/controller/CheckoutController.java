@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.CheckoutDetail;
+import com.example.demo.model.Coupon;
 import com.example.demo.model.Orders;
 import com.example.demo.model.PaymentDetails;
 import com.example.demo.repository.CartRepository;
 import com.example.demo.repository.CheckoutRepository;
+import com.example.demo.repository.CouponRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.PaymentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,6 +63,8 @@ public class CheckoutController {
 	 @Autowired
 	 private PaymentRepository paymentRepository;
 	 
+	 @Autowired
+	 private CouponRepository couponRepository;
 	 
 	 @Autowired
 	 private CartRepository cartRepository;
@@ -75,6 +79,8 @@ public class CheckoutController {
 
 	        String orderId = paymentPayload.get("orderid");
 	        String paymentId = paymentPayload.get("paymentid");
+	        String code = paymentPayload.get("couponcode");
+
 	        String key = paymentPayload.get("razorpayKey"); // Use correct key name
 	        double amount = 0;
 	        int userId = 0;
@@ -107,6 +113,13 @@ public class CheckoutController {
 	            
 	            String cartItemsJson = paymentPayload.get("cartItems");
 
+	         
+	            
+	            
+	            Coupon coupon = couponRepository.findByCode(code);
+	            
+	            coupon.setUsercount(coupon.getUsercount() + 1);
+	            
 	            System.out.println(cartItemsJson);
 	            try {
 	                ObjectMapper mapper = new ObjectMapper();
@@ -121,6 +134,8 @@ public class CheckoutController {
 	    	            ObjectMapper objectMapper = new ObjectMapper();
 	    	            Map<String, String> productMap = objectMapper.readValue(productname, Map.class);
 
+	    	            System.out.println(code);
+	    	      
 	    	            
 	    	            System.out.println("English Name: " + productMap.get("en")); // Laptop
 	    	            String englishname = productMap.get("en");
@@ -215,6 +230,7 @@ public class CheckoutController {
 	        orderRequest.put("receipt", "order_rcptid_11");
 	        orderRequest.put("payment_capture", true);
 
+	        
 	        Order order = razorpay.orders.create(orderRequest);
 
 	        Map<String, Object> response = new HashMap<>();
@@ -223,7 +239,7 @@ public class CheckoutController {
 	        response.put("currency", order.get("currency"));
 	        response.put("key", key);
 
-	        return ResponseEntity.ok(response);
+	       return ResponseEntity.ok(response);
 	    }
 	
 
