@@ -38,8 +38,8 @@ public class SecurityConfig {
             				"/admin/download-csv/*","/admin/confirm-delete/*","/api/stores/delete/*","/locale/*","/api/stores/add/",
             				"/api/products/cart","/api/products/cart/bulk","/api/products/cart/*", "/api/checkout/save",
             				"/api/checkout/create-order", "/api/checkout/refund","/api/checkout/payment-details",
-            				"/api/coupons/all","api/coupons/add","/api/coupons/**",
-
+            				"/api/coupons/all","api/coupons/add","/api/coupons/**","/api/checkout/orders/*",
+            				"/api/checkout/order/**",
             				"/api/products/save-product").permitAll()
             		.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()

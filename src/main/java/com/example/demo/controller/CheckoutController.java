@@ -1,19 +1,7 @@
 package com.example.demo.controller;
 
-import java.util.HashMap;
-
-import java.util.Map;
-
-import java.util.TreeMap;
-
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.CheckoutDetail;
 import com.example.demo.model.Coupon;
@@ -69,9 +57,44 @@ public class CheckoutController {
 	 @Autowired
 	 private CartRepository cartRepository;
 
+	 
+	 
+	
 	   private final String key = "rzp_test_k6Pox5bCFlqv8t";
 	    private final String secret = "ZznAUEwNgBzlUpnkF9J29sfs";
 
+	    
+	
+	    @GetMapping("/orders/{userId}")
+	    public ResponseEntity<?> getOrdersByUserId(@PathVariable int userId) {
+	        System.out.println("come");
+	        try {
+	        	
+	            List<Orders> orders = orderRepository.findByUserid(userId);
+	            return ResponseEntity.ok(orders);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+	        }
+	    }
+
+	    
+	    
+	    @DeleteMapping("/order/{orderid}/{id}")
+	    public ResponseEntity<String> deleteOrder(@PathVariable int id , @PathVariable String orderid) {
+	        System.out.println("checks dknjdjkdjwbjfsjfs");
+	        System.out.println("orderid"+orderid);
+	        System.out.println("id"+id);
+	        Optional<Orders> optionalOrder = orderRepository.findByOrderidAndProductid(orderid, id);
+
+	        if (optionalOrder.isPresent()) {
+	            orderRepository.delete(optionalOrder.get());
+	            return ResponseEntity.ok("Order deleted successfully");
+	        } else {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+	        }
+	    }
+	    
 	    @PostMapping("/payment-details")
 	    @Transactional
 	    public ResponseEntity<?> savePayment(@RequestBody Map<String, String> paymentPayload) {
@@ -115,16 +138,32 @@ public class CheckoutController {
 
 	         
 	            
+//	            
+//	            Coupon coupon = couponRepository.findByCode(code);
+//	            
+//	            coupon.setUsercount(coupon.getUsercount() + 1);
+//	            
+//	            if (coupon.getUsercount() > 10) {
+//					System.out.println("getting");
+//					coupon.setActive(false);
+//				}
+//	            
+	            
+	            
 	            
 	            Coupon coupon = couponRepository.findByCode(code);
-	            
-	            coupon.setUsercount(coupon.getUsercount() + 1);
-	            
-	            if (coupon.getUsercount() > 10) {
-					System.out.println("getting");
-					coupon.setActive(false);
-				}
-	            
+
+	            if (coupon != null) {
+	                coupon.setUsercount(coupon.getUsercount() + 1);
+
+	                if (coupon.getUsercount() > 10) {
+	                    System.out.println("getting");
+	                    coupon.setActive(false);
+	                }
+
+	                couponRepository.save(coupon); // make sure to save the updated coupon
+	            }
+
 	            System.out.println(cartItemsJson);
 	            try {
 	                ObjectMapper mapper = new ObjectMapper();
