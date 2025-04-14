@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import java.math.BigDecimal;
+import java.math.BigDecimal;	
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -138,7 +138,15 @@ public class AddContoller {
 	                Integer productid = (item.get("productid") instanceof Number) ? ((Number) item.get("productid")).intValue() : null;
 	                String productname = (item.get("productname") instanceof String) ? (String) item.get("productname") : null;
 	                Integer quantity = (item.get("quantity") instanceof Number) ? ((Number) item.get("quantity")).intValue() : null;
-
+		           
+	                
+	                
+	                ObjectMapper objectMapper = new ObjectMapper();
+		            Map<String, String> productMap = objectMapper.readValue(productname, Map.class);
+		            System.out.println("English Name: " + productMap.get("en")); // Laptop
+		            String englishname = productMap.get("en");
+		            System.out.println(englishname);
+		        
 	                if (productid == null || productname == null || quantity == null) {
 	                    System.out.println("Skipping invalid cart item: " + item);
 	                    continue;
@@ -152,7 +160,7 @@ public class AddContoller {
 	                    Cart newCartItem = new Cart();
 	                    newCartItem.setUserid(userId);
 	                    newCartItem.setProductid(productid);
-	                    newCartItem.setProductname(productname);
+	                    newCartItem.setProductname(englishname);
 	                    newCartItem.setQuantity(quantity);
 	                    cartRepository.save(newCartItem);
 	                }
