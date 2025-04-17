@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,11 @@ import com.example.demo.dto.CategoryDTO;
 import com.example.demo.dto.ProductDTO;
 import com.example.demo.dto.SubCategoryDTO;
 import com.example.demo.model.Admin;
+import com.example.demo.model.Cart;
 import com.example.demo.model.Product;
 import com.example.demo.model.Store;
 import com.example.demo.repository.AdminRepository;
+import com.example.demo.repository.CartRepository;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.StoreRepository;
@@ -55,7 +58,8 @@ public class StoreController {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    
+    @Autowired
+    private CartRepository cartRepository;
     @Autowired
 	private CsvService csvService;
     
@@ -86,19 +90,32 @@ public class StoreController {
             System.out.println("Deleting store ID: " + storeId);
 
             List<Product> products = productRepository.findByStoreid(String.valueOf(storeId));
-	           if (!products.isEmpty()) {
-	               productRepository.deleteAll(products);
-	               System.out.println("Deleted all products of adminId: " + storeId);
-	           }
+
+            if (!products.isEmpty()) {
+                for (Product product : products) {
+                    int productId = product.getId();
+
+                    Optional<Cart> cartItemOpt = cartRepository.findByProductid(productId);
+                    cartItemOpt.ifPresent(cartItem -> {
+                        cartRepository.delete(cartItem);
+                        System.out.println("Deleted cart item for product ID: " + productId);
+                    });
+                }
+
+                productRepository.deleteAll(products);
+                System.out.println("Deleted all products of storeId: " + storeId);
+            }
 
             storeRepository.deleteById(Integer.parseInt(storeId));
             System.out.println("Deleted store ID: " + storeId);
 
-            return ResponseEntity.ok("Store and all associated products deleted successfully.");
+            return ResponseEntity.ok("Store, associated products, and related cart items deleted successfully.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error deleting store: " + e.getMessage());
         }
     }
+
+
 
 
 

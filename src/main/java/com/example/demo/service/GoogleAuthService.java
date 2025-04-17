@@ -47,6 +47,8 @@ public class GoogleAuthService {
                     response.put("id", adminData.getId());
                     response.put("name", adminData.getName());
                     response.put("email", adminData.getEmail());
+                    response.put("role", adminData.getRole());
+
                     response.put("token", token);
                     adminData.setToken(token);
                     adminRepository.save(adminData);

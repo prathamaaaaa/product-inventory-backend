@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import java.math.BigDecimal;	
+import java.math.BigDecimal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,21 +53,21 @@ public class AddContoller {
 	    @Autowired
 	    private CartRepository cartRepository;
 	    
-	    @DeleteMapping("/cart/{id}")
-	    public ResponseEntity<String> deleteCartItem(@PathVariable int id) {
+	    @DeleteMapping("/cart/{userid}/{productid}")
+	    public ResponseEntity<String> deleteCartItemByUserAndProduct(@PathVariable int userid, @PathVariable int productid) {
 	        try {
-	            Optional<Cart> cartItem = cartRepository.findByProductid(id);
-	            if (cartItem.isPresent()) {
-	                cartRepository.delete(cartItem.get());
+	            Cart cartItem = cartRepository.findByUseridAndProductid(userid, productid);
+	            if (cartItem != null) {
+	                cartRepository.delete(cartItem);
 	                return ResponseEntity.ok("Cart item deleted successfully");
 	            } else {
-	                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("Cart item not found");
+	                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("Cart item not found for given user and product ID");
 	            }
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error deleting cart item: " + e.getMessage());
 	        }
-	    }	
+	    }
 
 	    @PostMapping("/cart")
 	    public ResponseEntity<String> addToCart(@RequestBody Map<String, Object> cart) {
@@ -86,19 +86,18 @@ public class AddContoller {
 	            Map<String, String> productMap = objectMapper.readValue(productname, Map.class);
 
 	            
-	            System.out.println("English Name: " + productMap.get("en")); // Laptop
+	            System.out.println("English Name: " + productMap.get("en")); 
 	            String englishname = productMap.get("en");
 	            System.out.println(englishname);
-	            Optional<Cart> existingCartItem = cartRepository.findByProductid(productid);
-	            System.out.println(existingCartItem);
-	            if (existingCartItem.isPresent()) {
-	                Cart cartItem = existingCartItem.get();
-	                cartItem.setQuantity(quantity);
-		            System.out.println(cartItem.getQuantity());
+	            Cart existingCartItem = cartRepository.findByUseridAndProductid(userid, productid);
 
-	                cartRepository.save(cartItem);
+	            System.out.println(existingCartItem);
+	            
+	            if (existingCartItem != null) {
+	                existingCartItem.setQuantity(quantity);
+	                cartRepository.save(existingCartItem);
 	                return ResponseEntity.ok("Cart item quantity updated");
-	            } else {
+	            }  else {
 	                Cart newCartItem = new Cart();
 	                newCartItem.setProductid(productid);
 	                newCartItem.setQuantity(quantity);
@@ -123,6 +122,7 @@ public class AddContoller {
 	            System.out.println("Received cart data: " + data);
 
 	            Integer userId = (data.get("userid") instanceof Number) ? ((Number) data.get("userid")).intValue() : null;
+	            
 	            if (userId == null) {
 	                return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("Invalid user ID");
 	            }
@@ -143,7 +143,7 @@ public class AddContoller {
 	                
 	                ObjectMapper objectMapper = new ObjectMapper();
 		            Map<String, String> productMap = objectMapper.readValue(productname, Map.class);
-		            System.out.println("English Name: " + productMap.get("en")); // Laptop
+		            System.out.println("English Name: " + productMap.get("en")); 
 		            String englishname = productMap.get("en");
 		            System.out.println(englishname);
 		        
@@ -154,7 +154,9 @@ public class AddContoller {
 
 	                Cart existingCartItem = cartRepository.findByUseridAndProductid(userId, productid);
 	                if (existingCartItem != null) {
-	                    existingCartItem.setQuantity(existingCartItem.getQuantity() );
+//	                    existingCartItem.setQuantity(existingCartItem.getQuantity() );
+	                    existingCartItem.setQuantity(existingCartItem.getQuantity()+quantity);
+		               
 	                    cartRepository.save(existingCartItem);
 	                } else {
 	                    Cart newCartItem = new Cart();
