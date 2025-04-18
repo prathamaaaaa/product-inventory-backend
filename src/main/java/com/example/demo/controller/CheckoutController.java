@@ -37,7 +37,6 @@ import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/checkout")
-@CrossOrigin(origins = "http://localhost:5173")
 public class CheckoutController {
 	
 	

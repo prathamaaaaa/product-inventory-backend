@@ -26,7 +26,6 @@ import com.example.demo.model.Coupon;
 import com.example.demo.repository.CouponRepository;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/coupons")
 public class CouponController {
 	

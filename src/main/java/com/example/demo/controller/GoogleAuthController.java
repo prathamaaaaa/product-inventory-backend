@@ -12,7 +12,6 @@ import com.example.demo.service.GoogleAuthService;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:5173") 
 public class GoogleAuthController {
 
     private final GoogleAuthService googleAuthService;

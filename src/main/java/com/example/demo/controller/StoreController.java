@@ -43,7 +43,6 @@ import io.opencensus.resource.Resource;
 
 @RestController
 @RequestMapping("/api/stores")
-@CrossOrigin(origins = "http://localhost:5173") // Allow frontend requests
 public class StoreController {
 
     @Autowired

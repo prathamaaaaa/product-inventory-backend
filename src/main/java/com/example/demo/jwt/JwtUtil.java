@@ -7,7 +7,7 @@ import javax.crypto.SecretKey;
 
 @Component
 public class JwtUtil {
-    private final SecretKey secretKey = Keys.hmacShaKeyFor("your-super-secret-key-your-secret".getBytes()); // ✅ Fix Secret Key
+    private final SecretKey secretKey = Keys.hmacShaKeyFor("your-super-secret-key-your-secret".getBytes());
     private final long expirationMs = 86400000; // 1 day
 
     public String generateToken(String email) {
@@ -15,7 +15,7 @@ public class JwtUtil {
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(secretKey, SignatureAlgorithm.HS256) // ✅ Use Correct Signing Key
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
