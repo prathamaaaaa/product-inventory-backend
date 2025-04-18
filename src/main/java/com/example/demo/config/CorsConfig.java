@@ -19,7 +19,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") 
-                .allowedOrigins(frontendUrl, "http://localhost:3000")
+                .allowedOrigins(frontendUrl, "http://localhost:3000","https://product-inventory-nine.vercel.app")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
