@@ -1,0 +1,7 @@
+/mvnw text eol=lf
+*.cmd text eol=crlf
+*.java text eol=lf
+*.properties text eol=lf
+*.xml text eol=lf
+# Add other text file extensions as needed
+* text=auto eol=lf
